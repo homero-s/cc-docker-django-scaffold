@@ -38,6 +38,29 @@ This will spin up your Django app (and database / Nginx if you enabled them).
 
 ---
 
+## ⚙️ Database Options
+
+When you generate a project, you can choose which database backend to use:
+
+- **SQLite** (default): Lightweight and great for quick prototypes or local development.  
+- **Postgres**: A production-ready relational database. This template includes a ready-to-run Postgres container in `docker-compose.yml`.
+
+If you select **Postgres**, update your `.env` file with the correct connection string **and** Postgres credentials:
+
+```env
+# DATABASE_URL takes precedence if set
+DATABASE_URL=postgres://app_user:app_password@db:5432/app_db
+
+# These are used by the `db` service (Postgres container)
+POSTGRES_DB=app_db
+POSTGRES_USER=app_user
+POSTGRES_PASSWORD=app_password
+```
+
+If you use **SQLite**, Django will automatically use a local `db.sqlite3` file inside the container.
+
+---
+
 ## ⚙️ Common Management Commands
 
 Run Django commands inside the `web` container:
@@ -64,7 +87,12 @@ Example:
 ```env
 DEBUG=1
 SECRET_KEY=supersecret
-DATABASE_URL=postgres://user:password@db:5432/app_db
+# For Postgres projects (recommended for dev/prod):
+DATABASE_URL=postgres://app_user:app_password@db:5432/app_db
+POSTGRES_DB=app_db
+POSTGRES_USER=app_user
+POSTGRES_PASSWORD=app_password
+# For SQLite projects (no DATABASE_URL needed)
 ```
 
 ---
@@ -80,7 +108,16 @@ If you enabled Nginx during setup, it will be included in your `docker-compose.y
 - Django 5.2 project scaffold
 - Docker Compose setup with Python, Postgres (optional), and Nginx (optional)
 - `.env` support out of the box
+- Supports **SQLite** (default) and **Postgres** databases
 - Easy extension for production deployments
+
+---
+
+## 🔧 How Postgres is wired
+
+- `docker-compose.yml` defines a `db` service using the official **postgres:16** image.
+- On first start, Postgres reads environment variables from `.env` to initialize the database.
+- Optional SQL scripts in `db/init/` are automatically run by the container (e.g., to create extensions).
 
 ---
 

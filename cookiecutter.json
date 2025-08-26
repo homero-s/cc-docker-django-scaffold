@@ -1,7 +1,15 @@
 {
-  "project_name": "My Web App",
+  "project_name": "My Awesome Project",
   "project_slug": "{{ cookiecutter.project_name.lower().replace(' ', '_').replace('-', '_') }}",
-  "author_name": "Your Name",
-  "python_version": "3.11",
-  "use_nginx": ["y", "n"]
+  "description": "A Django web application",
+  "author_name": "Brick Top",
+
+  "domain_name": "example.com",
+  "email": "{{ cookiecutter.author_name.lower() | trim() |replace(' ', '-') }}@{{ cookiecutter.domain_name.lower() | trim() }}",
+
+  "timezone": "UTC",
+  "python_version": "3.13",
+  
+  "use_nginx": ["y", "n"],
+  "use_postgres": ["y", "n"]
 }

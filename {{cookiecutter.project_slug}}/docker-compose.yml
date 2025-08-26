@@ -2,15 +2,22 @@ version: "3.9"
 
 services:
   web:
-    build: .
+    build:
+      context: .
+      dockerfile: Dockerfile
     container_name: {{cookiecutter.project_slug}}_web
     env_file: .env
     volumes:
       - ./app:/app
+{% if cookiecutter.use_postgres == 'y' %} 
+    depends_on:
+      db:
+        condition: service_healthy
+{% endif %}
     ports:
       - "8000:8000"
 
-{% if cookiecutter.use_nginx == "y" -%}
+{% if cookiecutter.use_nginx == "y" %}
   nginx:
     image: nginx:alpine
     container_name: {{cookiecutter.project_slug}}_nginx
@@ -21,3 +28,24 @@ services:
     depends_on:
       - web
 {% endif %}
+
+{% if cookiecutter.use_postgres == 'y' %}
+  db:
+    image: postgres:16
+    restart: unless-stopped
+    env_file: .env
+    environment:
+      - POSTGRES_DB=${POSTGRES_DB:-app_db}
+      - POSTGRES_USER=${POSTGRES_USER:-app_user}
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD:-app_password}
+    volumes:
+      - ./db/data:/var/lib/postgresql/data
+      - ./db/init:/docker-entrypoint-initdb.d
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U $$POSTGRES_USER -d $$POSTGRES_DB"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+    ports:
+      - "5432:5432"
+{% endif %}    
