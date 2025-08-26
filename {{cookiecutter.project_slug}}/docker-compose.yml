@@ -1,0 +1,23 @@
+version: "3.9"
+
+services:
+  web:
+    build: .
+    container_name: {{cookiecutter.project_slug}}_web
+    env_file: .env
+    volumes:
+      - ./app:/app
+    ports:
+      - "8000:8000"
+
+{% if cookiecutter.use_nginx == "y" -%}
+  nginx:
+    image: nginx:alpine
+    container_name: {{cookiecutter.project_slug}}_nginx
+    ports:
+      - "80:80"
+    volumes:
+      - ./nginx/default.conf:/etc/nginx/conf.d/default.conf
+    depends_on:
+      - web
+{% endif %}
