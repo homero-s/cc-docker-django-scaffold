@@ -1,6 +1,6 @@
 # cc-docker-webapp
 
-A [Cookiecutter](https://cookiecutter.readthedocs.io/) template for quickly bootstrapping a **Django 5.2** web application with **Docker Compose** and optional **Nginx** reverse proxy support.
+A [Cookiecutter](https://cookiecutter.readthedocs.io/) template for quickly bootstrapping a **Django** web application with **Docker Compose** and optional **Nginx** reverse proxy support.
 
 This template sets up a containerized Django project with sensible defaults so you can focus on building your app instead of boilerplate.
 

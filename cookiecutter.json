@@ -9,6 +9,7 @@
 
   "timezone": "UTC",
   "python_version": "3.13",
+  "django_version": "5.2",
   
   "use_nginx": ["y", "n"],
   "use_postgres": ["y", "n"]
