@@ -25,20 +25,7 @@ Default values are provided in [`cookiecutter.json`](./cookiecutter.json).
 
 ---
 
-## 🐳 Running the Project with Docker
-
-Once your project is created:
-
-```bash
-cd <your_project_slug>
-docker compose up --build
-```
-
-This will spin up your Django app (and database / Nginx if you enabled them).
-
----
-
-## ⚙️ Database Options
+### ⚙️ Database Options
 
 When you generate a project, you can choose which database backend to use:
 
@@ -61,6 +48,19 @@ If you use **SQLite**, Django will automatically use a local `db.sqlite3` file i
 
 ---
 
+## 🐳 Running the Project with Docker
+
+Once your project is created:
+
+```bash
+cd <your_project_slug>
+docker compose up --build
+```
+
+This will spin up your Django app (and database / Nginx if you enabled them).
+
+---
+
 ## ⚙️ Common Management Commands
 
 Run Django commands inside the `web` container:
@@ -78,7 +78,7 @@ docker compose exec web python manage.py test
 
 ---
 
-## 📂 Environment Variables
+### 📂 Environment Variables
 
 Put your environment configuration in a `.env` file at the root of your project. Docker Compose will automatically load it.
 
