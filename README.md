@@ -156,7 +156,7 @@ pytest tests/test_bake_defaults.py -v
 - ✅ **Bake with defaults** (SQLite + no Nginx)  
 - ✅ **Option matrix** (`use_postgres=y/n`, `use_nginx=y/n`)  
 - ✅ **File integrity**: no unrendered Jinja, `.env` usage, core files exist  
-- ✅ **Docs check**: README contains quickstart and `manage.py` usage  
+
 
 ---
 
