@@ -11,7 +11,7 @@ docker compose up --build
 
 {% if cookiecutter.use_nginx == "y" %}
 - With Nginx proxy: [http://localhost](http://localhost)
-{% elseif %}
+{% elif %}
 - Django app: [http://localhost:8000](http://localhost:8000)  
 {% endif %}
 
