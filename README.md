@@ -1,4 +1,4 @@
-# 🐳 cc-docker-webapp
+# cc-docker-webapp
 
 A [Cookiecutter](https://cookiecutter.readthedocs.io/) template for quickly bootstrapping a **Django 5.2** web application with **Docker Compose** and optional **Nginx** reverse proxy support.
 
@@ -17,7 +17,7 @@ pip install cookiecutter
 Now generate a new project from this template:
 
 ```bash
-cookiecutter https://github.com/homero-s/cc-docker-webapp
+cookiecutter gh:homero-s/cc-docker-webapp
 ```
 
 Cookiecutter will prompt you for some details (project name, slug, database, Nginx option, etc.).  
@@ -103,6 +103,10 @@ If you enabled Nginx during setup, it will be included in your `docker-compose.y
 
 ---
 
+✨ That’s it! You now have a fully containerized Django project scaffolded and ready for development.
+
+---
+
 ## ✨ Features
 
 - Django 5.2 project scaffold
@@ -113,11 +117,46 @@ If you enabled Nginx during setup, it will be included in your `docker-compose.y
 
 ---
 
-## 🔧 How Postgres is wired
+## 🧪 Running the Test Suite
 
-- `docker-compose.yml` defines a `db` service using the official **postgres:16** image.
-- On first start, Postgres reads environment variables from `.env` to initialize the database.
-- Optional SQL scripts in `db/init/` are automatically run by the container (e.g., to create extensions).
+This template includes a ready-made **pytest test suite** powered by [pytest-cookies](https://github.com/hackebrot/pytest-cookies).  
+It automatically bakes the template with different options (`use_postgres`, `use_nginx`) and checks that the generated project is valid.
+
+### Install dependencies
+
+If you’re using **requirements file**:
+
+```bash
+pip install -r requirements-dev.txt
+```
+
+
+### Run tests
+
+Run all tests:
+
+```bash
+pytest
+```
+
+Run with less output:
+
+```bash
+pytest -q
+```
+
+Run a specific test file:
+
+```bash
+pytest tests/test_bake_defaults.py -v
+```
+
+### What the tests cover
+
+- ✅ **Bake with defaults** (SQLite + no Nginx)  
+- ✅ **Option matrix** (`use_postgres=y/n`, `use_nginx=y/n`)  
+- ✅ **File integrity**: no unrendered Jinja, `.env` usage, core files exist  
+- ✅ **Docs check**: README contains quickstart and `manage.py` usage  
 
 ---
 
@@ -128,5 +167,3 @@ If you enabled Nginx during setup, it will be included in your `docker-compose.y
 - [Docker Compose Docs](https://docs.docker.com/compose/)
 
 ---
-
-✨ That’s it! You now have a fully containerized Django project scaffolded and ready for development.
