@@ -219,18 +219,57 @@ PY
   fi
 }
 
+# --- helpers ---------------------------------------------------------------
+
+is_proxy_profile_active() {
+  # Profiles passed via Make (e.g. PROFILES='dev proxy db')
+  if [ -n "${PROFILES:-}" ] && echo "$PROFILES" | tr ' ,:' '\n' | grep -qx "proxy"; then
+    return 0
+  fi
+
+  return 1
+}
+
+# Choose a sensible host/port for the proxy. You can set these in .env if you like.
+get_proxy_base_url() {
+  local host="${NGINX_HOST:-${SERVER_NAME:-${DOMAIN:-localhost}}}"
+  local port="${NGINX_PORT:-80}"
+
+  # Show the port only if it's non-standard
+  if [ "$port" = "80" ]; then
+    printf "http://%s" "$host"
+  else
+    printf "http://%s:%s" "$host" "$port"
+  fi
+}
+
+# --- summary ---------------------------------------------------------------
+
 print_summary() {
-  echo
-  log "All set! Summary:"
-  echo "  - Compose profiles: ${PROFILES:-none}"
-  echo "  - Env file: $ENV_FILE"
-  echo "  - App URL: http://127.0.0.1:${WEB_PORT}/"
-  echo "  - Admin:   http://127.0.0.1:${WEB_PORT}/admin/"
-  if [[ -n "$SU_USERNAME" ]]; then
-    echo "  - Superuser: ${SU_USERNAME} (${SU_EMAIL:-no email set})"
+  local app_path="${APP_PATH:-/}"        # e.g. "/" or "/app/"
+  local admin_path="${ADMIN_PATH:-/admin/}"
+  local direct_base="http://127.0.0.1:${WEB_PORT:-8000}"
+  local proxy_base
+
+  if is_proxy_profile_active; then
+    proxy_base="$(get_proxy_base_url)"
+    echo
+    echo "───────────────────────────────"
+    echo "✅ Reverse proxy is active"
+    echo "───────────────────────────────"
+    echo "App URL:    ${proxy_base%/}${app_path}"
+    echo "Admin URL:  ${proxy_base%/}${admin_path}"
+  else
+    echo
+    echo "───────────────────────────────"
+    echo "ℹ️  Reverse proxy not active"
+    echo "───────────────────────────────"
+    echo "App URL:    ${direct_base%/}${app_path}"
+    echo "Admin URL:  ${direct_base%/}${admin_path}"
   fi
   echo
 }
+
 
 # -------- arg parsing --------
 while [[ $# -gt 0 ]]; do
