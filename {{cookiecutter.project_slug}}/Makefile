@@ -6,6 +6,10 @@ DB              ?= db
 ENV_FILE        ?= .env
 PORT            ?= 8000
 
+BACKUPS_DIR ?= backups
+STAMP       := $(shell date -u +%Y%m%dT%H%M%SZ)
+BACKUP      ?= $(BACKUPS_DIR)/$(STAMP).dump
+
 # Compose command with profiles applied
 CMD = $(DOCKER_COMPOSE) $(foreach p,$(PROFILES),--profile $(p))
 
@@ -113,17 +117,16 @@ dbshell:
 	@if ! $(CMD) ps $(DB) >/dev/null 2>&1; then echo "No '$(DB)' service (enable db profile)"; exit 2; fi
 	$(CMD) exec -it $(DB) psql -U $$POSTGRES_USER -d $$POSTGRES_DB
 
-# Usage: make db-backup FILE=backup.sql
-db-backup:
-	@if [ -z "$(FILE)" ]; then echo "Usage: make db-backup FILE=backup.sql"; exit 2; fi
-	@if ! $(CMD) ps $(DB) >/dev/null 2>&1; then echo "No '$(DB)' service (enable db profile)"; exit 2; fi
-	# Expand $$POSTGRES_* inside the container; stream dump to host file
-	$(CMD) exec -T $(DB) sh -lc 'pg_dump -U "$$POSTGRES_USER" "$$POSTGRES_DB"' > "$(FILE)"
-	@echo "Wrote $(FILE)"
 
-# Usage: make db-restore FILE=backup.sql
+.PHONY: db-backup db-restore
+db-backup:
+	@mkdir -p "$(BACKUPS_DIR)"
+	@if ! $(CMD) ps $(DB) >/dev/null 2>&1; then echo "No '$(DB)' service (enable db profile)"; exit 2; fi
+	$(CMD) exec -T $(DB) sh -lc 'pg_dump -Fc -U "$$POSTGRES_USER" "$$POSTGRES_DB"' > "$(BACKUP)"
+	@echo "Wrote $(BACKUP)"
+
+# Usage: make db-restore FILE=backups/20250101T000000Z.dump
 db-restore:
-	@if [ -z "$(FILE)" ]; then echo "Usage: make db-restore FILE=backup.sql"; exit 2; fi
-	@if ! $(CMD) ps $(DB) >/devnull 2>&1; then echo "No '$(DB)' service (enable db profile)"; exit 2; fi
-	# Feed host file into psql inside the container
-	cat "$(FILE)" | $(CMD) exec -T $(DB) sh -lc 'psql -U "$$POSTGRES_USER" "$$POSTGRES_DB"'
+	@if [ -z "$(FILE)" ]; then echo "Usage: make db-restore FILE=backups/xxx.dump"; exit 2; fi
+	@if ! $(CMD) ps $(DB) >/dev/null 2>&1; then echo "No '$(DB)' service (enable db profile)"; exit 2; fi
+	cat "$(FILE)" | $(CMD) exec -T $(DB) sh -lc 'pg_restore -U "$$POSTGRES_USER" -d "$$POSTGRES_DB" --clean --if-exists'
