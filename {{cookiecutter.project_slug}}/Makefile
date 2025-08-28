@@ -117,11 +117,13 @@ dbshell:
 db-backup:
 	@if [ -z "$(FILE)" ]; then echo "Usage: make db-backup FILE=backup.sql"; exit 2; fi
 	@if ! $(CMD) ps $(DB) >/dev/null 2>&1; then echo "No '$(DB)' service (enable db profile)"; exit 2; fi
-	$(CMD) exec -T $(DB) pg_dump -U $$POSTGRES_USER -d $$POSTGRES_DB > "$(FILE)"
+	# Expand $$POSTGRES_* inside the container; stream dump to host file
+	$(CMD) exec -T $(DB) sh -lc 'pg_dump -U "$$POSTGRES_USER" "$$POSTGRES_DB"' > "$(FILE)"
 	@echo "Wrote $(FILE)"
 
 # Usage: make db-restore FILE=backup.sql
 db-restore:
 	@if [ -z "$(FILE)" ]; then echo "Usage: make db-restore FILE=backup.sql"; exit 2; fi
-	@if ! $(CMD) ps $(DB) >/dev/null 2>&1; then echo "No '$(DB)' service (enable db profile)"; exit 2; fi
-	cat "$(FILE)" | $(CMD) exec -T $(DB) psql -U $$POSTGRES_USER -d $$POSTGRES_DB
+	@if ! $(CMD) ps $(DB) >/devnull 2>&1; then echo "No '$(DB)' service (enable db profile)"; exit 2; fi
+	# Feed host file into psql inside the container
+	cat "$(FILE)" | $(CMD) exec -T $(DB) sh -lc 'psql -U "$$POSTGRES_USER" "$$POSTGRES_DB"'
