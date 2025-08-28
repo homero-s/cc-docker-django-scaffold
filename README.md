@@ -1,6 +1,6 @@
-# cc-docker-webapp
+# cc-docker-django-scaffold
 
-A [Cookiecutter](https://cookiecutter.readthedocs.io/) template for quickly bootstrapping a **Django** web application with **Docker Compose** and optional **Nginx** reverse proxy support.
+A [Cookiecutter](https://cookiecutter.readthedocs.io/) template for quickly bootstrapping a **Docker Compose** project scaffold. It will allow you to create a  **Django** web application with **Database** support for SQLite and Postgres, and optional **Nginx** reverse proxy support.
 
 This template sets up a containerized Django project with sensible defaults so you can focus on building your app instead of boilerplate.
 
@@ -8,10 +8,15 @@ This template sets up a containerized Django project with sensible defaults so y
 
 ## 🚀 Generate a New Project
 
-First, make sure you have **Python 3.10+** and **pip** installed. Then install [Cookiecutter](https://cookiecutter.readthedocs.io/):
+Personally I enjoy using [pipenv](https://pipenv.pypa.io/en/latest/).
+
+
+First, make sure you have a virtualenv set up with at least **Python 3.10+**. Then install [Cookiecutter](https://cookiecutter.readthedocs.io/):
 
 ```bash
-pip install cookiecutter
+pipenv --python 3.10
+pipenv shell 
+pipenv install -r requirements-dev.txt
 ```
 
 Now generate a new project from this template:
@@ -25,14 +30,14 @@ Default values are provided in [`cookiecutter.json`](./cookiecutter.json).
 
 ---
 
-### ⚙️ Database Options
+### 🗄️ Database Options
 
 When you generate a project, you can choose which database backend to use:
 
-- **SQLite** (default): Lightweight and great for quick prototypes or local development.  
-- **Postgres**: A production-ready relational database. This template includes a ready-to-run Postgres container in `docker-compose.yml`.
+- **SQLite**: Lightweight and great for quick prototypes or local development.  
+- **Postgres** (default): A production-ready relational database. This template includes a ready-to-run Postgres container in `docker-compose.yml`.
 
-If you select **Postgres**, update your `.env` file with the correct connection string **and** Postgres credentials:
+If you select **Postgres**, update your `.env.example` file with the correct connection string **and** Postgres credentials:
 
 ```env
 # DATABASE_URL takes precedence if set
@@ -50,74 +55,20 @@ If you use **SQLite**, Django will automatically use a local `db.sqlite3` file i
 
 ## 🐳 Running the Project with Docker
 
-Once your project is created:
-
-```bash
-cd <your_project_slug>
-docker compose up --build
-```
-
-This will spin up your Django app (and database / Nginx if you enabled them).
-
----
-
-## ⚙️ Common Management Commands
-
-Run Django commands inside the `web` container:
-
-```bash
-# Apply database migrations
-docker compose exec web python manage.py migrate
-
-# Create a Django superuser
-docker compose exec web python manage.py createsuperuser
-
-# Run tests
-docker compose exec web python manage.py test
-```
-
----
-
-### 📂 Environment Variables
-
-Put your environment configuration in a `.env` file at the root of your project. Docker Compose will automatically load it.
-
-Example:
-
-```env
-DEBUG=1
-SECRET_KEY=supersecret
-# For Postgres projects (recommended for dev/prod):
-DATABASE_URL=postgres://app_user:app_password@db:5432/app_db
-POSTGRES_DB=app_db
-POSTGRES_USER=app_user
-POSTGRES_PASSWORD=app_password
-# For SQLite projects (no DATABASE_URL needed)
-```
-
----
-
-## 🌐 Optional Nginx Proxy
-
-If you enabled Nginx during setup, it will be included in your `docker-compose.yml` and proxy requests to your Django app automatically.
-
----
-
-✨ That’s it! You now have a fully containerized Django project scaffolded and ready for development.
+Read setup instructions in the generated project files `{{cookiecutter.project_slug}}/README.md`
+Put your environment configuration in `.env.example` file at the root of your project. 
 
 ---
 
 ## ✨ Features
 
-- Django 5.2 project scaffold
+- Django project scaffold
 - Docker Compose setup with Python, Postgres (optional), and Nginx (optional)
-- `.env` support out of the box
-- Supports **SQLite** (default) and **Postgres** databases
-- Easy extension for production deployments
+- Easily extensible
 
 ---
 
-## 🧪 Running the Test Suite
+## 🧪Test Suite
 
 This template includes a ready-made **pytest test suite** powered by [pytest-cookies](https://github.com/hackebrot/pytest-cookies).  
 It automatically bakes the template with different options (`use_postgres`, `use_nginx`) and checks that the generated project is valid.
